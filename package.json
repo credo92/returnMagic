@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.2",
+    "lodash": "^4.17.4",
     "shippo": "^1.3.0",
     "when": "^3.7.8"
   }
