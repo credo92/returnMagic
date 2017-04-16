@@ -1,5 +1,5 @@
-var shippo = require('shippo')('<shippo token>');
-var token = '<shippo token>';
+var shippo = require('shippo')('shippo_test_f2a949829c09df2740bf198b87dd5548aa02943b');
+var token = 'shippo_test_f2a949829c09df2740bf198b87dd5548aa02943b';
 
 class ProviderAbstract
  {

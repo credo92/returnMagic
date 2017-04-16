@@ -102,9 +102,21 @@ class CanadaPostProvider extends ProviderAbstract
     const postReq = https.request(postOptions, (res)=>{
      res.setEncoding('utf8');
      res.on('data', (chunk)=>{
-  console.log(JSON.parse(chunk,null,2));
-
-     })
+                  var obj = JSON.parse(chunk);
+                console.log(JSON.parse(chunk,null,2));
+                console.log('Shipment ID: '+obj.object_id);
+                if(obj.rates.length)
+                {
+                  for (var i = 0; i < obj.rates.length; i++)
+                   {
+                    console.log(obj.rates[i]);
+                   }
+                }
+                else
+                {
+                  console.log('No Shipment rates has been provided');
+                }
+      })
     });
     postReq.write(JSON.stringify(postData));
     postReq.end();
@@ -115,46 +127,46 @@ class CanadaPostProvider extends ProviderAbstract
 
 const myCPInstance = new CanadaPostProvider('ShippoToken shippo_test_f2a949829c09df2740bf198b87dd5548aa02943b')
   var addressFrom={
-                      "name": "Vipul Srivastav",
-                      "company": "Belfort 103",
+                      "name": "Mark James",
+                      "company": "Apartment 3777",
                       "street_no": "",
                       "street1": "Chemin de la Cote-des-neiges",
                       "street2": "Chemin de la Côte-des-Neiges",
                       "city": "Montreal",
                       "state": "QC",
-                      "zip": "H3H 1V8",
+                      "zip": "H3H 1V5",
                       "country": "CA",
-                      "phone": "512-123-1234",
-                      "email": "vipulsrivastav92@gmail.com"
+                      "phone": "512-231-1224",
+                      "email": "maverick@gmail.com"
                     };
 var addressTo=		{
-										  "name":"Shawn Ippotle",
-									    "company":"Shippo",
-									    "street1":"215 Clayton St.",
+										  "name":"Jamie Sanderyn",
+									    "company":"abc",
+									    "street1":"400 Clayton St.",
 									    "city":"San Francisco",
 									    "state":"CA",
 									    "zip":"94117",
 									    "country":"US", // iso2 country code
-									    "phone":"+1 123 345 9350",
-									    "email":"shippotle@goshippo.com"
+									    "phone":"+1 000 345 0091",
+									    "email":"shippotle@go.com"
 										};
 var parcel =       {
-                      "length": "5",
-                          "width": "5",
+                      "length": "4",
+                          "width": "3",
                           "height": "5",
                           "distance_unit": "in",
-                          "weight": "2",
+                          "weight": "4",
                           "mass_unit": "lb",
                      };
 var customs_declaration =  {
                         "contents_type": "MERCHANDISE",
-                        "contents_explanation": "T-Shirt purchase",
+                        "contents_explanation": "Jeans purchase",
                         "non_delivery_option": "RETURN",
                         "certify": true,
-                        "certify_signer": "Vipul Srivastav",
+                        "certify_signer": "Markman",
                         "items": [{
-                       				     "description":"T-Shirt",
-                       				     "quantity":20,
+                       				     "description":"Jeans",
+                       				     "quantity":10,
                        				     "net_weight":"1",
                        				     "mass_unit":"lb",
                        				     "value_amount":"200",
@@ -176,11 +188,11 @@ const myAddress = {
 } ;// Structure of the object to be defined
 
 // Following POST calls create address, parcels, customs, then we get Rates by
-myCPInstance.createData('/addresses',addressFrom);
-myCPInstance.createData('/addresses',addressTo);
-
-myCPInstance.createData('/parcels',parcels);
-
-myCPInstance.createData('/customs/declarations/',customs_declaration);
+// myCPInstance.createData('/addresses',addressFrom);
+// myCPInstance.createData('/addresses',addressTo);
+//
+// myCPInstance.createData('/parcels',parcels);
+//
+// myCPInstance.createData('/customs/declarations/',customs_declaration);
 
  myCPInstance.getRates('/shipments',myAddress);
