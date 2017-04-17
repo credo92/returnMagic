@@ -10,6 +10,9 @@
 // getRates creates shipment and prints the rates array
 
 const https = require('https');
+var request = require("request");
+
+var SHIPMENT_OBJECT_ID;
 
 class ProviderAbstract
 {
@@ -39,7 +42,7 @@ class ProviderAbstract
     const postReq = https.request(postOptions, (res)=>{
     	res.setEncoding('utf8');
     	res.on('data', (chunk)=>{
-    		console.log(JSON.parse(chunk,null,2));
+    		//console.log(JSON.parse(chunk,null,2));
     	})
     });
     postReq.write(JSON.stringify(postData));
@@ -81,11 +84,11 @@ class CanadaPostProvider extends ProviderAbstract
 {
   // To be implemented
 
-  getRates(path,postData)
+  getRates(path,myAddress)
     {
 
     this.path = path;
-    this.postData = postData;
+    this.postData = myAddress;
     const shippoToken = this.token // Replace with your token
 
     let postOptions = {
@@ -103,9 +106,10 @@ class CanadaPostProvider extends ProviderAbstract
      res.setEncoding('utf8');
      res.on('data', (chunk)=>{
                   var obj = JSON.parse(chunk);
-                console.log(JSON.parse(chunk,null,2));
+                //console.log(JSON.parse(chunk,null,2));
                 console.log('Shipment ID: '+obj.object_id);
-                if(obj.rates.length)
+                SHIPMENT_OBJECT_ID = obj.object_id;
+                if(obj.status==='SUCCESS'&&obj.rates.length)
                 {
                   for (var i = 0; i < obj.rates.length; i++)
                    {
@@ -114,18 +118,36 @@ class CanadaPostProvider extends ProviderAbstract
                 }
                 else
                 {
-                  console.log('No Shipment rates has been provided');
+                  console.log(obj.status+': No Shipment rates has been provided');
                 }
       })
+      res.on('end',function(){
+        // A  Callback function to perform GET Call to retrieve Rate for the created shipment
+        // Refer to -- https://goshippo.com/docs/reference/js#rates-get
+        request({
+          uri: 'https://api.goshippo.com/shipments/'+SHIPMENT_OBJECT_ID+'/rates',
+          method: "GET",
+          timeout: 10000,
+          followRedirect: true,
+          maxRedirects: 10,
+          headers: {
+            'Authorization': `ShippoToken <token>`,
+            'Content-Type': 'application/json'
+          }
+        }, function(error, response, body) {
+          console.log(JSON.parse(body));
+        });
+      })
     });
-    postReq.write(JSON.stringify(postData));
+    postReq.write(JSON.stringify(myAddress));
     postReq.end();
 
 
     }
+
   }
 
-const myCPInstance = new CanadaPostProvider('ShippoToken shippo_test_f2a949829c09df2740bf198b87dd5548aa02943b')
+const myCPInstance = new CanadaPostProvider('ShippoToken <TOKEN>')
   var addressFrom={
                       "name": "Mark James",
                       "company": "Apartment 3777",
@@ -188,11 +210,12 @@ const myAddress = {
 } ;// Structure of the object to be defined
 
 // Following POST calls create address, parcels, customs, then we get Rates by
-// myCPInstance.createData('/addresses',addressFrom);
-// myCPInstance.createData('/addresses',addressTo);
-//
-// myCPInstance.createData('/parcels',parcels);
-//
-// myCPInstance.createData('/customs/declarations/',customs_declaration);
+myCPInstance.createData('/addresses',addressFrom);
+myCPInstance.createData('/addresses',addressTo);
 
- myCPInstance.getRates('/shipments',myAddress);
+myCPInstance.createData('/parcels',parcels);
+
+myCPInstance.createData('/customs/declarations/',customs_declaration);
+myCPInstance.createData('/shipments',myAddress);
+
+myCPInstance.getRates('/shipments',myAddress);

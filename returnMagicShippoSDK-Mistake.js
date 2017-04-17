@@ -1,5 +1,5 @@
-var shippo = require('shippo')('shippo_test_f2a949829c09df2740bf198b87dd5548aa02943b');
-var token = 'shippo_test_f2a949829c09df2740bf198b87dd5548aa02943b';
+var shippo = require('shippo')('<token>');
+var token = '<token>';
 
 class ProviderAbstract
  {
@@ -133,7 +133,7 @@ const myAddress = {
 }
  // Structure of the object to be
 // defined
-const myCPInstance = new CanadaPostProvider('shippo_test_f2a949829c09df2740bf198b87dd5548aa02943b')
+const myCPInstance = new CanadaPostProvider('<token>')
 myCPInstance.getRates(myAddress)
 // => Should returns an
 // array of available rates
